@@ -1,61 +1,63 @@
-const express = require("express");
-const cors =require('cors');
+const express = require('express');
+const cors = require('cors');
 const { MongoClient } = require('mongodb');
+const socket = require('socket.io');
 
 //environment vars
-require('dotenv').config()
+require('dotenv').config();
+
+const PORT = process.env.PORT || 5000;
 
 // app instance
 const app = express();
+// middle were
+app.use(cors());
+app.use(express.json());
 
+// server instance
+const server = app.listen(PORT, () => {
+  console.log('running the server at.........', PORT);
+});
 
-// middle were 
-app.use(cors())
-app.use(express.json())
+// io implementation
+const io = socket(server, {
+  cors: { origin: '*' }
+});
 
-//mongo client uri 
+const ioFunction = () => {
+  io.on('connect', (socket) => {
+    console.log('New client connected', socket.id);
+
+    socket.on('message', (data) => {
+      console.log(data);
+      io.emit('message', { message: data });
+    });
+
+    socket.on('disconnect', () => {
+      console.log(`${socket.id} just left the chat`);
+    });
+  });
+};
+
+//mongo client uri
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.hai4j.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const client = new MongoClient(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
-async function run () {
-    try{
-        client.connect();
-        //data base connected  
-        console.log('database connected');
-
-
-    }
-    finally{
-        // await client.close()
-
-    }
-
+async function run() {
+  try {
+    client.connect();
+    ioFunction();
+    //data base connected
+    console.log('database connected');
+  } finally {
+    // await client.close()
+  }
 }
-run().catch(console.dir)
+run().catch(console.dir);
 
-
-
-
-
-
-
-
-
-
-
-
-
-const PORT = process.env.PORT || 5000 ;
-
-app.get('/', (req, res)=> {
-    res.send('chat app is running')
-})
-
-app.listen(PORT, ()=> {
-    console.log('running the server at.........', PORT)
-})
-
-
-
-
-
+app.get('/', (req, res) => {
+  res.send('chat app is running');
+});
