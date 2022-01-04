@@ -48,10 +48,23 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    client.connect();
+    await client.connect();
+    const database = client.db('chat-app');
+    const userCollection = database.collection('users');
     ioFunction();
     //data base connected
     console.log('database connected');
+
+    app.post('/upgetUser', async (req, res) => {
+      const { body } = req;
+      const result = await userCollection.findOne({ email: body.email });
+      if (!result) {
+        const insertResult = await userCollection.insertOne(body);
+        if (insertResult.insertedId) res.json(body);
+      } else {
+        res.json(result);
+      }
+    });
   } finally {
     // await client.close()
   }
