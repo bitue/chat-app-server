@@ -3,12 +3,12 @@ const cors = require('cors');
 const { MongoClient } = require('mongodb');
 const socket = require('socket.io');
 const { addUser, deleteUser } = require('./userManager');
+// app instance
+const app = express();
 
 //environment vars
 require('dotenv').config();
 
-// app instance
-const app = express();
 // middle were
 app.use(cors());
 app.use(express.json());
@@ -18,6 +18,10 @@ const port = process.env.PORT || 5000;
 // server instance
 const server = app.listen(port, () => {
   console.log('Server running at port', port);
+});
+
+app.get('/', (req, res) => {
+  res.send('chat app is running at port', port);
 });
 
 // io implementation
@@ -44,8 +48,4 @@ io.on('connect', (socket) => {
     const activeUsers = deleteUser(socket.id);
     io.emit('join', activeUsers);
   });
-});
-
-app.get('/', (req, res) => {
-  res.send('chat app is running at port', port);
 });
