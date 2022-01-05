@@ -7,7 +7,7 @@ const { addUser, deleteUser } = require('./userManager');
 //environment vars
 require('dotenv').config();
 
-const PORT = process.env.PORT || 5000;
+const port = process.env.PORT || 5000;
 
 // app instance
 const app = express();
@@ -16,8 +16,8 @@ app.use(cors());
 app.use(express.json());
 
 // server instance
-const server = app.listen(PORT, () => {
-  console.log('Server running at port', PORT);
+const server = app.listen(port, () => {
+  console.log('Server running at port', port);
 });
 
 // io implementation
@@ -47,5 +47,5 @@ io.on('connect', (socket) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('chat app is running at port', PORT);
+  res.send('chat app is running at port', port);
 });
