@@ -7,13 +7,13 @@ const { addUser, deleteUser } = require('./userManager');
 //environment vars
 require('dotenv').config();
 
-const port = process.env.PORT || 5000;
-
 // app instance
 const app = express();
 // middle were
 app.use(cors());
 app.use(express.json());
+
+const port = process.env.PORT || 5000;
 
 // server instance
 const server = app.listen(port, () => {
